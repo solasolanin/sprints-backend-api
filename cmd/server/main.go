@@ -28,16 +28,16 @@ func main() {
 		log.Fatalf("Failed to create LiveKit client: %v", err)
 	}
 
-	proxy := proxy.NewRoomProxy(liveKitClient)
-	service := application.NewRoomService(proxy)
+	proxy := proxy.NewRoomManagementProxy(liveKitClient)
+	service := application.NewRoomManagementService(proxy)
 	handler := handler.NewRoomHandler(service)
 
 	r := gin.Default()
 
 	r.SetTrustedProxies([]string{
 		// TODO 実際のCloud Load BalancerのIPレンジに変更する
- 	   "35.191.0.0/16",
-	   "130.211.0.0/22",
+		"35.191.0.0/16",
+		"130.211.0.0/22",
 	})
 
 	r.GET("/room-list", handler.ListRooms)

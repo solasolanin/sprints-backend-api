@@ -7,17 +7,17 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-type RoomProxy struct {
+type RoomManagementProxy struct {
 	client *client.LiveKitClient
 }
 
-func NewRoomProxy(lkClient *client.LiveKitClient) *RoomProxy {
-	return &RoomProxy{
+func NewRoomManagementProxy(lkClient *client.LiveKitClient) *RoomManagementProxy {
+	return &RoomManagementProxy{
 		client: lkClient,
 	}
 }
 
-func (roomProxy *RoomProxy) CreateRoom(ctx context.Context, roomName string) (*livekit.Room, error) {
+func (roomProxy *RoomManagementProxy) CreateRoom(ctx context.Context, roomName string) (*livekit.Room, error) {
 	req := &livekit.CreateRoomRequest{
 		Name: roomName,
 	}
@@ -29,7 +29,7 @@ func (roomProxy *RoomProxy) CreateRoom(ctx context.Context, roomName string) (*l
 	return res, nil
 }
 
-func (roomProxy *RoomProxy) GetRoomList(ctx context.Context) ([]*livekit.Room, error) {
+func (roomProxy *RoomManagementProxy) GetRoomList(ctx context.Context) ([]*livekit.Room, error) {
 	req := &livekit.ListRoomsRequest{}
 
 	res, err := roomProxy.client.RoomServiceClient().ListRooms(ctx, req)
@@ -39,4 +39,3 @@ func (roomProxy *RoomProxy) GetRoomList(ctx context.Context) ([]*livekit.Room, e
 
 	return res.Rooms, nil
 }
-	

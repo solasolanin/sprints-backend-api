@@ -9,10 +9,10 @@ import (
 )
 
 type RoomHandler struct {
-	roomService *application.RoomService
+	roomService *application.RoomManagementService
 }
 
-func NewRoomHandler(roomService *application.RoomService) *RoomHandler {
+func NewRoomHandler(roomService *application.RoomManagementService) *RoomHandler {
 	return &RoomHandler{
 		roomService: roomService,
 	}
