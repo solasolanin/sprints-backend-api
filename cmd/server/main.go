@@ -34,11 +34,10 @@ func main() {
 
 	r := gin.Default()
 
-	// Define your routes here
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
+	r.SetTrustedProxies([]string{
+		// TODO 実際のCloud Load BalancerのIPレンジに変更する
+ 	   "35.191.0.0/16",
+	   "130.211.0.0/22",
 	})
 
 	r.GET("/room-list", handler.ListRooms)
