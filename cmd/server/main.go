@@ -29,8 +29,9 @@ func main() {
 	}
 
 	proxy := proxy.NewRoomManagementProxy(liveKitClient)
-	service := application.NewRoomManagementService(proxy)
-	handler := handler.NewRoomHandler(service)
+	roomManagementService := application.NewRoomManagementService(proxy)
+	roomTokenService := application.NewRoomTokenService()
+	handler := handler.NewRoomHandler(roomManagementService, roomTokenService)
 
 	r := gin.Default()
 
@@ -42,6 +43,8 @@ func main() {
 
 	r.GET("/room-list", handler.ListRooms)
 	r.POST("/room", handler.CreateRoom)
+
+	r.POST("/room-token", handler.GetRoomToken)
 
 	// Start the server
 	if err := r.Run(":8080"); err != nil {

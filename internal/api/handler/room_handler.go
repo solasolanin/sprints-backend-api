@@ -9,17 +9,21 @@ import (
 )
 
 type RoomHandler struct {
-	roomService *application.RoomManagementService
+	roomManagementService *application.RoomManagementService
+	roomTokenService      *application.RoomTokenService
 }
 
-func NewRoomHandler(roomService *application.RoomManagementService) *RoomHandler {
+func NewRoomHandler(
+	roomManagementService *application.RoomManagementService,
+	roomTokenService *application.RoomTokenService) *RoomHandler {
 	return &RoomHandler{
-		roomService: roomService,
+		roomManagementService: roomManagementService,
+		roomTokenService:      roomTokenService,
 	}
 }
 
 func (h *RoomHandler) ListRooms(ctx *gin.Context) {
-	rooms, err := h.roomService.GetAllRooms(ctx)
+	rooms, err := h.roomManagementService.GetAllRooms(ctx)
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
@@ -38,10 +42,27 @@ func (h *RoomHandler) CreateRoom(ctx *gin.Context) {
 		return
 	}
 
-	room, err := h.roomService.CreateRoom(ctx, req.RoomName)
+	room, err := h.roomManagementService.CreateRoom(ctx, req.RoomName)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	ctx.JSON(http.StatusOK, room)
 }
+
+func (h *RoomHandler) GetRoomToken(ctx *gin.Context) {
+	var req request.GetRoomTokenRequest
+	err := ctx.ShouldBindJSON(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	token, err := h.roomTokenService.GetRoomToken(req.RoomName, req.Identity)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"token": token})
+}	
