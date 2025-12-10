@@ -19,7 +19,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func env_road() {
+func roadEnv() {
 	err := godotenv.Load(".env.local")
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -57,7 +57,7 @@ func connectDB() (*sql.DB, error) {
 
 func main() {
 	// .envファイルの読み込み
-	env_road()
+	roadEnv()
 
 	// LiveKitクライアントをアプリケーション起動時に一度だけ初期化
 	liveKitClient, err := client.NewLiveKitClient()
