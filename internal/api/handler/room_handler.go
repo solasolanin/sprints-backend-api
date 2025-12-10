@@ -11,14 +11,18 @@ import (
 type RoomHandler struct {
 	roomManagementService *application.RoomManagementService
 	roomTokenService      *application.RoomTokenService
+	roomCreationService *application.RoomCreationService
 }
 
 func NewRoomHandler(
 	roomManagementService *application.RoomManagementService,
-	roomTokenService *application.RoomTokenService) *RoomHandler {
+	roomTokenService *application.RoomTokenService,
+	roomCreationService *application.RoomCreationService,
+) *RoomHandler {
 	return &RoomHandler{
 		roomManagementService: roomManagementService,
 		roomTokenService:      roomTokenService,
+		roomCreationService:   roomCreationService,
 	}
 }
 
@@ -42,7 +46,7 @@ func (h *RoomHandler) CreateRoom(ctx *gin.Context) {
 		return
 	}
 
-	room, err := h.roomManagementService.CreateRoom(ctx, req.RoomName)
+	room, err := h.roomCreationService.CreateRoom(ctx, req.RoomName)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

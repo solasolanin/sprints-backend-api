@@ -7,7 +7,6 @@ import (
 )
 
 type RoomManagementProxy interface {
-	CreateRoom(ctx context.Context, roomName string) (*livekit.Room, error)
 	GetRoomList(ctx context.Context) ([]*livekit.Room, error)
 }
 
@@ -23,8 +22,4 @@ func NewRoomManagementService(roomProxy RoomManagementProxy) *RoomManagementServ
 
 func (service *RoomManagementService) GetAllRooms(ctx context.Context) ([]*livekit.Room, error) {
 	return service.roomProxy.GetRoomList(ctx)
-}
-
-func (service *RoomManagementService) CreateRoom(ctx context.Context, roomName string) (*livekit.Room, error) {
-	return service.roomProxy.CreateRoom(ctx, roomName)
 }
