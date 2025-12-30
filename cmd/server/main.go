@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -14,6 +15,7 @@ import (
 	"sprinta-backend-api/internal/infrastructure/repository"
 	"time"
 
+	firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
@@ -71,6 +73,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect database: %v", err)
 		return
+	}
+
+	// Firebaseアプリの初期化
+	app, err := firebase.NewApp(context.Background(), nil)
+	if err != nil {
+		log.Fatalf("error initializing app: %v\n", err)
+	}
+	// Firebase Authクライアントの取得
+	_, err = app.Auth(context.Background())
+	if err != nil {
+		log.Fatalf("error getting Auth client: %v\n", err)
 	}
 
 	proxy := proxy.NewRoomManagementProxy(liveKitClient)
