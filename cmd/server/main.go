@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	// "context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -15,7 +15,7 @@ import (
 	"sprinta-backend-api/internal/infrastructure/repository"
 	"time"
 
-	firebase "firebase.google.com/go"
+	// firebase "firebase.google.com/go"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
@@ -75,23 +75,24 @@ func main() {
 		return
 	}
 
-	// Firebaseアプリの初期化
-	app, err := firebase.NewApp(context.Background(), nil)
-	if err != nil {
-		log.Fatalf("error initializing app: %v\n", err)
-	}
-	// Firebase Authクライアントの取得
-	_, err = app.Auth(context.Background())
-	if err != nil {
-		log.Fatalf("error getting Auth client: %v\n", err)
-	}
+	// // Firebaseアプリの初期化
+	// app, err := firebase.NewApp(context.Background(), nil)
+	// if err != nil {
+	// 	log.Fatalf("error initializing app: %v\n", err)
+	// }
+	// // Firebase Authクライアントの取得
+	// _, err = app.Auth(context.Background())
+	// if err != nil {
+	// 	log.Fatalf("error getting Auth client: %v\n", err)
+	// }
 
 	proxy := proxy.NewRoomManagementProxy(liveKitClient)
 	roomManagementService := application.NewRoomManagementService(proxy)
 	roomRepository := repository.NewRoomRepository(db)
 	roomCreationService := application.NewRoomCreationService(proxy, roomRepository)
 	roomTokenService := application.NewRoomTokenService()
-	handler := handler.NewRoomHandler(roomManagementService, roomTokenService, roomCreationService)
+	roomHandler := handler.NewRoomHandler(roomManagementService, roomTokenService, roomCreationService)
+	noticeHandler := handler.NewNoticeHandler()
 
 	r := gin.Default()
 
@@ -101,10 +102,11 @@ func main() {
 		"130.211.0.0/22",
 	})
 
-	r.GET("/room-list", handler.ListRooms)
-	r.POST("/room", handler.CreateRoom)
+	r.GET("/room-list", roomHandler.ListRooms)
+	r.POST("/room", roomHandler.CreateRoom)
 
-	r.POST("/room-token", handler.GetRoomToken)
+	r.POST("/room-token", roomHandler.GetRoomToken)
+	r.GET("/notices", noticeHandler.ListNotices)
 
 	// Start the server
 	if err := r.Run(":8080"); err != nil {
