@@ -20,7 +20,7 @@ func (r *RoomRepository) RegisterRoom(ctx context.Context, room entity.Room) err
 		return fmt.Errorf("database connection is nil")
 	}
 
-	query := "INSERT INTO rooms (sid, name, participant_count, rank, created_at, closed_flg, delete_flg) VALUES ($1, $2, $3, $4, $5, false, false)"
+	query := "INSERT INTO rooms (sid, name, participant_count, rank, created_at, delete_flg) VALUES ($1, $2, $3, $4, $5, false)"
 	res, err := r.db.ExecContext(
 		ctx,
 		query,
