@@ -45,3 +45,28 @@ func (r *RoomRepository) RegisterRoom(ctx context.Context, room entity.Room) err
 
 	return nil
 }
+
+func (r *RoomRepository) DecrementParticipantCountBySid(ctx context.Context, sid string) error {
+	if r.db == nil {
+		return fmt.Errorf("database connection is nil")
+	}
+
+	// Ensure participant_count doesn't go below zero
+	query := `UPDATE rooms SET participant_count = GREATEST(participant_count - 1, 0) WHERE sid = $1 AND delete_flg = false`
+
+	res, err := r.db.ExecContext(ctx, query, sid)
+	if err != nil {
+		return fmt.Errorf("failed to decrement participant_count: %w", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no room found to decrement for sid %s", sid)
+	}
+
+	return nil
+}
