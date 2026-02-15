@@ -61,6 +61,13 @@ func main() {
 	// .envファイルの読み込み
 	roadEnv()
 
+	// Cloud Runの環境変数からポートを取得（デフォルトは8080）
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Println("Listening on port", port)
+
 	// LiveKitクライアントをアプリケーション起動時に一度だけ初期化
 	liveKitClient, err := client.NewLiveKitClient()
 	if err != nil {
@@ -91,7 +98,8 @@ func main() {
 	roomRepository := repository.NewRoomRepository(db)
 	roomCreationService := application.NewRoomCreationService(proxy, roomRepository)
 	roomTokenService := application.NewRoomTokenService()
-	roomHandler := handler.NewRoomHandler(roomManagementService, roomTokenService, roomCreationService)
+	roomWebhookService := application.NewRoomWebhookService(roomRepository)
+	roomHandler := handler.NewRoomHandler(roomManagementService, roomTokenService, roomCreationService, roomWebhookService)
 	noticeHandler := handler.NewNoticeHandler()
 
 	r := gin.Default()
@@ -107,9 +115,10 @@ func main() {
 
 	r.POST("/room-token", roomHandler.GetRoomToken)
 	r.GET("/notices", noticeHandler.ListNotices)
+	r.POST("/webhook/livekit", roomHandler.LiveKitWebhook)
 
 	// Start the server
-	if err := r.Run(":8080"); err != nil {
+	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("failed to run server: %v", err)
 	}
 }
